@@ -17,6 +17,7 @@ class StepRecorder:
         path: 迷路探索での最終経路。
         compare: ソートでの比較。
         swap: ソートでの交換。
+        overwrite: ソートでの上書き（マージ時の一時バッファからの書き戻し）。
     """
 
     def __init__(self):
@@ -45,6 +46,14 @@ class StepRecorder:
     def record_swap(self, indices):
         """ソートで交換したインデックスのリストを記録する。"""
         self.add("swap", indices=indices)
+
+    def record_overwrite(self, index, value):
+        """ソートでインデックス`index`の位置に`value`を上書きしたことを記録する。
+
+        マージソートのように、2要素の相互交換ではなく一時バッファから
+        値を1件書き戻すことで配列を更新するアルゴリズムのためのステップ。
+        """
+        self.add("overwrite", index=index, value=value)
 
     def to_list(self):
         """記録済みの全ステップを、記録した順の`list[dict]`として返す。"""

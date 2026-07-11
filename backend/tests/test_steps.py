@@ -34,6 +34,12 @@ def test_record_swap_appends_swap_step():
     assert recorder.to_list() == [{"type": "swap", "indices": [2, 3]}]
 
 
+def test_record_overwrite_appends_overwrite_step():
+    recorder = StepRecorder()
+    recorder.record_overwrite(4, 10)
+    assert recorder.to_list() == [{"type": "overwrite", "index": 4, "value": 10}]
+
+
 def test_steps_are_returned_in_recorded_order():
     recorder = StepRecorder()
     recorder.record_visit(0, 0)
