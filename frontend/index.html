@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Algo Visualizer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="app-header">
+    <h1 class="app-title">Algo Visualizer</h1>
+    <p class="app-subtitle">迷路探索とソートのアルゴリズムを見て学べる可視化ツール</p>
+  </header>
+
+  <nav class="tab-bar" role="tablist" aria-label="表示切り替え">
+    <button type="button" class="tab-button is-active" data-tab="maze">迷路</button>
+    <button type="button" class="tab-button" data-tab="sort">ソート</button>
+  </nav>
+
+  <main class="tab-content">
+    <section id="maze-panel" class="tab-panel">
+      <h2>迷路探索</h2>
+      <div id="maze-error" class="error-banner" role="alert" hidden></div>
+      <form class="maze-form">
+        <div class="form-field">
+          <label for="maze-width">幅（マス数）</label>
+          <input type="number" id="maze-width" name="width" min="3" max="101" value="21" required>
+        </div>
+        <div class="form-field">
+          <label for="maze-height">高さ（マス数）</label>
+          <input type="number" id="maze-height" name="height" min="3" max="101" value="21" required>
+        </div>
+        <button type="button" id="generate-maze-btn" class="cta-button">迷路を生成する</button>
+      </form>
+      <canvas id="maze-canvas" class="maze-canvas"></canvas>
+      <form class="solve-form">
+        <div class="form-field">
+          <label for="algorithm-select">探索アルゴリズム</label>
+          <select id="algorithm-select" name="algorithm">
+            <option value="bfs">幅優先探索（BFS）</option>
+            <option value="dijkstra">ダイクストラ法</option>
+            <option value="astar">A*探索</option>
+          </select>
+        </div>
+        <button type="button" id="solve-maze-btn" class="secondary-button">探索を開始する</button>
+      </form>
+    </section>
+
+    <section id="sort-panel" class="tab-panel">
+      <h2>ソート</h2>
+      <div id="sort-error" class="error-banner" role="alert" hidden></div>
+      <form class="sort-form">
+        <div class="form-field">
+          <label for="sort-size">配列サイズ（要素数）</label>
+          <input type="number" id="sort-size" name="size" min="5" max="200" value="30" required>
+        </div>
+        <div class="form-field">
+          <label for="sort-algorithm-select">並び替えアルゴリズム</label>
+          <select id="sort-algorithm-select" name="algorithm">
+            <option value="bubble">バブルソート</option>
+            <option value="quick">クイックソート</option>
+            <option value="merge">マージソート</option>
+          </select>
+        </div>
+        <button type="button" id="start-sort-btn" class="cta-button">ソートを開始する</button>
+      </form>
+      <canvas id="sort-canvas" class="sort-canvas"></canvas>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <p>Algo Visualizer — 学習用ポートフォリオアプリ</p>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
