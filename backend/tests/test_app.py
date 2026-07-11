@@ -39,6 +39,32 @@ def test_create_maze_rejects_non_json_body(client):
     assert "error" in response.get_json()
 
 
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {"height": 10},  # widthが欠損
+        {"width": 10},  # heightが欠損
+        {"width": "10", "height": 10},  # widthが文字列
+        {"width": 10.5, "height": 10},  # widthが小数
+        {"width": True, "height": 10},  # widthが真偽値
+        {"width": 2, "height": 10},  # widthが範囲外（3未満）
+        {"width": 10, "height": 102},  # heightが範囲外（101超）
+    ],
+)
+def test_create_maze_rejects_invalid_size(client, payload):
+    response = client.post("/api/maze", json=payload)
+    assert response.status_code == 400
+    body = response.get_json()
+    assert "error" in body
+    assert "Traceback" not in body["error"]
+
+
+@pytest.mark.parametrize("size", [3, 101])
+def test_create_maze_accepts_boundary_size(client, size):
+    response = client.post("/api/maze", json={"width": size, "height": size})
+    assert response.status_code == 200
+
+
 def test_solve_maze_returns_expected_structure(client):
     maze = client.post("/api/maze", json={"width": 9, "height": 9}).get_json()
 
@@ -68,6 +94,25 @@ def test_solve_maze_returns_expected_structure(client):
     assert path_steps[0]["cells"][-1] == [maze["width"] - 1, maze["height"] - 1]
 
 
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {"grid": [[False, False], [False, False]]},  # algorithmが欠損
+        {"grid": [[False, False], [False, False]], "algorithm": "dfs"},  # 未知のalgorithm
+        {"algorithm": "bfs"},  # gridが欠損
+        {"algorithm": "bfs", "grid": []},  # gridが空配列
+        {"algorithm": "bfs", "grid": [[False, False], [False]]},  # ジャグ配列
+        {"algorithm": "bfs", "grid": [[0, 1], [1, 0]]},  # 要素がbool以外（int）
+    ],
+)
+def test_solve_maze_rejects_invalid_input(client, payload):
+    response = client.post("/api/maze/solve", json=payload)
+    assert response.status_code == 400
+    body = response.get_json()
+    assert "error" in body
+    assert "Traceback" not in body["error"]
+
+
 @pytest.mark.parametrize("algorithm", ["bubble", "quick", "merge"])
 def test_sort_returns_expected_structure(client, algorithm):
     values = [5, 3, 8, 1, 9, 2, 7, 4, 6, 0, 15, 12, 19, 11, 18, 13, 16, 10, 14, 17]
@@ -91,3 +136,42 @@ def test_sort_rejects_non_json_body(client):
     )
     assert response.status_code == 400
     assert "error" in response.get_json()
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {"values": [3, 1, 2]},  # algorithmが欠損
+        {"values": [3, 1, 2], "algorithm": "heap"},  # 未知のalgorithm
+        {"algorithm": "bubble"},  # valuesが欠損
+        {"algorithm": "bubble", "values": "1,2,3"},  # valuesが配列でない
+        {"algorithm": "bubble", "values": [1, "a", 3]},  # 要素に非数値が混在
+        {"algorithm": "bubble", "values": [1, True, 3]},  # 要素に真偽値が混在
+    ],
+)
+def test_sort_rejects_invalid_input(client, payload):
+    response = client.post("/api/sort", json=payload)
+    assert response.status_code == 400
+    body = response.get_json()
+    assert "error" in body
+    assert "Traceback" not in body["error"]
+
+
+def test_sort_rejects_values_over_size_limit(client):
+    response = client.post(
+        "/api/sort", json={"algorithm": "bubble", "values": list(range(201))}
+    )
+    assert response.status_code == 400
+    body = response.get_json()
+    assert "error" in body
+
+
+def test_sort_accepts_values_at_size_limit(client):
+    # 200件ちょうどは受理される（境界値の確認）。
+    # quickソートの最悪ケースでも再帰深さは200件相当にしかならず、
+    # RecursionErrorが起きる997件以上のしきい値には遠く及ばない。
+    values = list(range(200))
+    response = client.post(
+        "/api/sort", json={"algorithm": "quick", "values": values}
+    )
+    assert response.status_code == 200
