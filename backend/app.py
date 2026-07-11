@@ -1,11 +1,11 @@
-from flask import Flask
+from flask import Flask, send_from_directory
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="../frontend", static_url_path="")
 
 
 @app.route("/")
 def index():
-    return "<h1>Algo Visualizer (準備中)</h1>"
+    return send_from_directory(app.static_folder, "index.html")
 
 
 if __name__ == "__main__":
