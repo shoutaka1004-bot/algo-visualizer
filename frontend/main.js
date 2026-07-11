@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const mazeCanvas = document.getElementById('maze-canvas');
   const algorithmSelect = document.getElementById('algorithm-select');
   const solveMazeBtn = document.getElementById('solve-maze-btn');
+  const mazeErrorEl = document.getElementById('maze-error');
 
   if (
     !generateMazeBtn ||
@@ -39,9 +40,23 @@ document.addEventListener('DOMContentLoaded', () => {
     !mazeHeightInput ||
     !mazeCanvas ||
     !algorithmSelect ||
-    !solveMazeBtn
+    !solveMazeBtn ||
+    !mazeErrorEl
   ) {
     return;
+  }
+
+  // 技術的な詳細（例外名・HTTPステータスコード）を画面に出さず、次にとるべき
+  // 行動が分かる平易な文言だけを表示する（BRIEF.md 4-6節の教訓に準拠）。
+  // 「⚠」アイコンは色以外の区別手段として付与する。
+  function showError(el, message) {
+    el.textContent = `⚠ ${message}`;
+    el.hidden = false;
+  }
+
+  function hideError(el) {
+    el.hidden = true;
+    el.textContent = '';
   }
 
   const MAX_CANVAS_SIZE = 600;
@@ -154,6 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const width = Number(mazeWidthInput.value);
     const height = Number(mazeHeightInput.value);
 
+    hideError(mazeErrorEl);
     const originalLabel = generateMazeBtn.textContent;
     generateMazeBtn.disabled = true;
     generateMazeBtn.textContent = '生成中…';
@@ -171,6 +187,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!response.ok) {
         const errorBody = await response.json().catch(() => ({}));
         console.error('迷路の生成に失敗しました:', errorBody.error || response.status);
+        showError(
+          mazeErrorEl,
+          errorBody.error || '迷路の生成に失敗しました。入力値を確認して再度お試しください。'
+        );
         return;
       }
 
@@ -179,6 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
       drawMaze(mazeData);
     } catch (err) {
       console.error('迷路の生成中にエラーが発生しました:', err);
+      showError(mazeErrorEl, '通信に失敗しました。ネットワーク接続を確認し、再度お試しください。');
     } finally {
       generateMazeBtn.disabled = false;
       generateMazeBtn.textContent = originalLabel;
@@ -187,8 +208,11 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   solveMazeBtn.addEventListener('click', async () => {
+    hideError(mazeErrorEl);
+
     if (!currentMazeData) {
       console.error('迷路がまだ生成されていません。先に「迷路を生成する」を押してください。');
+      showError(mazeErrorEl, '迷路がまだ生成されていません。先に「迷路を生成する」を押してください。');
       return;
     }
 
@@ -214,6 +238,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!response.ok) {
         const errorBody = await response.json().catch(() => ({}));
         console.error('探索に失敗しました:', errorBody.error || response.status);
+        showError(
+          mazeErrorEl,
+          errorBody.error || '探索に失敗しました。迷路を生成し直して再度お試しください。'
+        );
         return;
       }
 
@@ -221,6 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
       await animateSolveSteps(steps);
     } catch (err) {
       console.error('探索中にエラーが発生しました:', err);
+      showError(mazeErrorEl, '通信に失敗しました。ネットワーク接続を確認し、再度お試しください。');
     } finally {
       solveMazeBtn.disabled = false;
       solveMazeBtn.textContent = originalLabel;
@@ -235,9 +264,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const sortAlgorithmSelect = document.getElementById('sort-algorithm-select');
   const startSortBtn = document.getElementById('start-sort-btn');
   const sortCanvas = document.getElementById('sort-canvas');
+  const sortErrorEl = document.getElementById('sort-error');
 
-  if (!sortSizeInput || !sortAlgorithmSelect || !startSortBtn || !sortCanvas) {
+  if (!sortSizeInput || !sortAlgorithmSelect || !startSortBtn || !sortCanvas || !sortErrorEl) {
     return;
+  }
+
+  // 迷路タブと同じ表示・非表示ロジック（BRIEF.md 4-6節の教訓に準拠）。
+  // DOMContentLoadedブロックが分かれているため、ここでも同一の定義を持つ。
+  function showError(el, message) {
+    el.textContent = `⚠ ${message}`;
+    el.hidden = false;
+  }
+
+  function hideError(el) {
+    el.hidden = true;
+    el.textContent = '';
   }
 
   const SORT_CANVAS_WIDTH = 760;
@@ -382,6 +424,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const size = Number(sortSizeInput.value);
     const algorithm = sortAlgorithmSelect.value;
 
+    hideError(sortErrorEl);
     const originalLabel = startSortBtn.textContent;
     startSortBtn.disabled = true;
     startSortBtn.textContent = 'ソート中…';
@@ -400,6 +443,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!response.ok) {
         const errorBody = await response.json().catch(() => ({}));
         console.error('ソートに失敗しました:', errorBody.error || response.status);
+        showError(
+          sortErrorEl,
+          errorBody.error || 'ソートに失敗しました。入力値を確認して再度お試しください。'
+        );
         return;
       }
 
@@ -407,6 +454,7 @@ document.addEventListener('DOMContentLoaded', () => {
       await animateSortSteps(steps, currentValues, maxValue);
     } catch (err) {
       console.error('ソート中にエラーが発生しました:', err);
+      showError(sortErrorEl, '通信に失敗しました。ネットワーク接続を確認し、再度お試しください。');
     } finally {
       startSortBtn.disabled = false;
       startSortBtn.textContent = originalLabel;
