@@ -36,6 +36,12 @@ body {
   text-align: center;
 }
 
+.algorithm-description {
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+  color: var(--color-text);
+}
+
 .app-title {
   margin: 0 0 0.5rem;
   font-size: 2rem;

@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const algorithmSelect = document.getElementById('algorithm-select');
   const solveMazeBtn = document.getElementById('solve-maze-btn');
   const mazeErrorEl = document.getElementById('maze-error');
+  const algorithmDescriptionEl = document.getElementById('algorithm-description');
 
   if (
     !generateMazeBtn ||
@@ -44,6 +45,21 @@ document.addEventListener('DOMContentLoaded', () => {
     !mazeErrorEl
   ) {
     return;
+  }
+
+  // 選択中の探索アルゴリズムに応じた短い説明文（タスク32、フィードバック対応）。
+  // #algorithm-descriptionが無くても迷路の生成・探索という主要機能は
+  // 止めたくないため、algorithmDescriptionElの有無で個別にガードする。
+  const algorithmDescriptions = {
+    bfs: 'スタート地点から近い順に、一歩ずつ全方向を均等に調べていく方法です。全ての移動が同じコストのときに、必ず最短経路を見つけられます。',
+    dijkstra: 'スタート地点から「ここまでの合計コストが一番小さいマス」を優先して調べていく方法です。今回の迷路は全マスの移動コストが同じなのでBFSと同じ結果になりますが、コストが異なる道にも対応できる汎用的な方法です。',
+    astar: 'ゴールまでの距離の見積もり（ヒューリスティック）を使い、ゴールに近づきそうな方向を優先して調べる方法です。BFSやダイクストラ法より無駄な探索が少なく、同じ最短経路をより効率的に見つけられます。',
+  };
+
+  if (algorithmDescriptionEl) {
+    algorithmSelect.addEventListener('change', () => {
+      algorithmDescriptionEl.textContent = algorithmDescriptions[algorithmSelect.value] || '';
+    });
   }
 
   // 技術的な詳細（例外名・HTTPステータスコード）を画面に出さず、次にとるべき
