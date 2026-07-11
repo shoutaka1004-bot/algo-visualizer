@@ -296,9 +296,25 @@ document.addEventListener('DOMContentLoaded', () => {
   const startSortBtn = document.getElementById('start-sort-btn');
   const sortCanvas = document.getElementById('sort-canvas');
   const sortErrorEl = document.getElementById('sort-error');
+  const sortAlgorithmDescriptionEl = document.getElementById('sort-algorithm-description');
 
   if (!sortSizeInput || !sortAlgorithmSelect || !startSortBtn || !sortCanvas || !sortErrorEl) {
     return;
+  }
+
+  // 選択中の並び替えアルゴリズムに応じた短い説明文（タスク33、迷路タブと同じパターン）。
+  // #sort-algorithm-descriptionが無くてもソートという主要機能は止めたくないため、
+  // sortAlgorithmDescriptionElの有無で個別にガードする。
+  const sortAlgorithmDescriptions = {
+    bubble: '隣り合う2つの値を比較し、順番が逆なら入れ替える、という操作を配列の端から端まで繰り返す方法です。仕組みが単純な分、要素数が多いと時間がかかります。',
+    quick: '基準となる値（ピボット）を1つ選び、それより小さい値・大きい値に配列を分割することを繰り返す方法です。多くの場合バブルソートより高速です。',
+    merge: '配列を半分に分割することを繰り返して十分小さくしたあと、整列済みの小さな配列同士を合体（マージ）させながら1つに戻していく方法です。データの並び方に関わらず安定した速さで処理できます。',
+  };
+
+  if (sortAlgorithmDescriptionEl) {
+    sortAlgorithmSelect.addEventListener('change', () => {
+      sortAlgorithmDescriptionEl.textContent = sortAlgorithmDescriptions[sortAlgorithmSelect.value] || '';
+    });
   }
 
   // 迷路タブと同じ表示・非表示ロジック（BRIEF.md 4-6節の教訓に準拠）。
