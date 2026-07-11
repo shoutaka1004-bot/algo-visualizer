@@ -66,3 +66,28 @@ def test_solve_maze_returns_expected_structure(client):
     assert len(path_steps) == 1
     assert path_steps[0]["cells"][0] == [0, 0]
     assert path_steps[0]["cells"][-1] == [maze["width"] - 1, maze["height"] - 1]
+
+
+@pytest.mark.parametrize("algorithm", ["bubble", "quick", "merge"])
+def test_sort_returns_expected_structure(client, algorithm):
+    values = [5, 3, 8, 1, 9, 2, 7, 4, 6, 0, 15, 12, 19, 11, 18, 13, 16, 10, 14, 17]
+
+    response = client.post(
+        "/api/sort", json={"values": values, "algorithm": algorithm}
+    )
+    assert response.status_code == 200
+
+    data = response.get_json()
+    assert "steps" in data
+    steps = data["steps"]
+    assert isinstance(steps, list)
+    assert len(steps) > 0
+    assert all(step["type"] in ("compare", "swap", "overwrite") for step in steps)
+
+
+def test_sort_rejects_non_json_body(client):
+    response = client.post(
+        "/api/sort", data="values=1&algorithm=bubble", content_type="text/plain"
+    )
+    assert response.status_code == 400
+    assert "error" in response.get_json()

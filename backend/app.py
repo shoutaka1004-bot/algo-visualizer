@@ -5,6 +5,9 @@ from maze.grid import Grid
 from maze.solvers.astar import solve_astar
 from maze.solvers.bfs import solve_bfs
 from maze.solvers.dijkstra import solve_dijkstra
+from sorting.bubble import sort_bubble
+from sorting.merge import sort_merge
+from sorting.quick import sort_quick
 
 app = Flask(__name__, static_folder="../frontend", static_url_path="")
 
@@ -48,6 +51,12 @@ _SOLVERS = {
     "bfs": solve_bfs,
     "dijkstra": solve_dijkstra,
     "astar": solve_astar,
+}
+
+_SORTERS = {
+    "bubble": sort_bubble,
+    "quick": sort_quick,
+    "merge": sort_merge,
 }
 
 
@@ -100,6 +109,28 @@ def solve_maze():
     start = (0, 0)
     goal = (grid.width - 1, grid.height - 1)
     steps = solver(grid, start, goal)
+
+    return jsonify({"steps": steps})
+
+
+@app.route("/api/sort", methods=["POST"])
+def sort_values():
+    """配列とアルゴリズム名を受け取り、ソートのステップ列を返す。
+
+    リクエストボディは`{"values": [...], "algorithm": "bubble"}`形式
+    （`algorithm`は`bubble`/`quick`/`merge`のいずれか）。
+
+    存在しないアルゴリズム名・`values`欠損・非数値要素などの丁寧な
+    バリデーションはタスク16の担当範囲のため、ここではリクエストボディ
+    がJSONとして解釈できない場合のみ400を返す（明らかにクラッシュする
+    入力への最低限の防御）。
+    """
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({"error": "リクエストボディが正しいJSON形式ではありません。"}), 400
+
+    sorter = _SORTERS[data.get("algorithm")]
+    steps = sorter(data.get("values"))
 
     return jsonify({"steps": steps})
 
