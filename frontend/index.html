@@ -32,7 +32,17 @@
         <button type="button" id="generate-maze-btn" class="cta-button">迷路を生成する</button>
       </form>
       <canvas id="maze-canvas" class="maze-canvas"></canvas>
-      <p class="panel-placeholder">（探索アルゴリズムの選択は今後のタスクで追加します）</p>
+      <form class="solve-form">
+        <div class="form-field">
+          <label for="algorithm-select">探索アルゴリズム</label>
+          <select id="algorithm-select" name="algorithm">
+            <option value="bfs">幅優先探索（BFS）</option>
+            <option value="dijkstra">ダイクストラ法</option>
+            <option value="astar">A*探索</option>
+          </select>
+        </div>
+        <button type="button" id="solve-maze-btn" class="secondary-button">探索を開始する</button>
+      </form>
     </section>
 
     <section id="sort-panel" class="tab-panel">

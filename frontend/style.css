@@ -127,6 +127,23 @@ body {
   color: var(--color-text);
 }
 
+.form-field select {
+  padding: 0.5rem;
+  border: 1px solid #CCCCCC;
+  border-radius: 6px;
+  font-size: 1rem;
+  color: var(--color-text);
+  background-color: var(--color-base-card);
+}
+
+.solve-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
 /*
   CTAボタン配色（タスク17で未検証だった組み合わせをここで確定）
   背景 var(--color-accent) #FF9F45（相対輝度 L ≈ 0.4649）
@@ -142,6 +159,26 @@ body {
   cursor: pointer;
   background-color: var(--color-accent);
   color: var(--color-text);
+}
+
+/*
+  二次的ボタン配色（探索を開始する等、主CTAより弱い強調に使う）
+  背景 var(--color-base-card) #FFFFFF（相対輝度 L = 1.0）
+  文字・ボーダー var(--color-main) #1F7A74（相対輝度 L ≈ 0.1547）
+  コントラスト比 = (1.0 + 0.05) / (0.1547 + 0.05) ≈ 5.13:1 → 4.5:1以上を満たすため採用
+  （タスク17で計算済みの「白文字 #FFFFFF on メイン背景 #1F7A74: 5.13:1」と
+    文字色・背景色を入れ替えただけの組み合わせ。コントラスト比の式は明暗を
+    入れ替えても対称なため同一の数値になる）
+*/
+.secondary-button {
+  border: 2px solid var(--color-main);
+  border-radius: 999px;
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: var(--color-base-card);
+  color: var(--color-main);
 }
 
 .maze-canvas {
