@@ -17,6 +17,12 @@ def index():
     return send_from_directory(app.static_folder, "index.html")
 
 
+@app.route("/api/health")
+def health():
+    """サーバーが起動して応答できることを確認するためのヘルスチェック用エンドポイント。"""
+    return jsonify({"status": "ok"})
+
+
 def _grid_to_walls(grid):
     """`Grid`を、行優先（yの昇順→xの昇順）の2次元真偽値配列に変換する。
 

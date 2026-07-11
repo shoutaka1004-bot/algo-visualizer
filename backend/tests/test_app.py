@@ -10,6 +10,12 @@ def client():
         yield client
 
 
+def test_health_returns_ok(client):
+    response = client.get("/api/health")
+    assert response.status_code == 200
+    assert response.get_json() == {"status": "ok"}
+
+
 def test_create_maze_returns_expected_structure(client):
     response = client.post("/api/maze", json={"width": 10, "height": 10})
     assert response.status_code == 200
