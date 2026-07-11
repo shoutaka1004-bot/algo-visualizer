@@ -107,6 +107,17 @@ document.addEventListener('DOMContentLoaded', () => {
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
   }
 
+  // #speed-selectの値からアニメーション時間の倍率を取得する。
+  // slow=3, normal=1.5, fast=1。要素が見つからない場合や想定外の値の場合は
+  // 既定値の'normal'(1.5)として扱う。
+  function getSpeedMultiplier() {
+    const speedSelect = document.getElementById('speed-select');
+    const value = speedSelect ? speedSelect.value : 'normal';
+    if (value === 'slow') return 3;
+    if (value === 'fast') return 1;
+    return 1.5;
+  }
+
   // 探索ステップ列（visit → 最後にpath）をCanvas上にアニメーション表示する。
   // 離散的な1マスずつの描画なので、requestAnimationFrameで毎フレームの経過時間を
   // 蓄積して間引くよりも、setTimeoutの再帰呼び出しでステップごとに任意の待機時間を
@@ -124,14 +135,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // 迷路が大きく数百ステップになりうるため、visit全体の目標合計時間から
     // 1ステップあたりの間隔を逆算する（大きい迷路ほど描画に時間がかかるのは
     // 自然な挙動として許容し、下限4ms・上限30msでクランプする）。
-    const TOTAL_VISIT_DURATION_MS = 2500;
+    // 上限・目標合計時間・pathの固定間隔には#speed-selectの倍率を掛けて
+    // 速度選択を反映する。下限はちらつき・CPU負荷を避けるための別目的の
+    // 値なので倍率を掛けず据え置く。
+    const speedMultiplier = getSpeedMultiplier();
+    const TOTAL_VISIT_DURATION_MS = 2500 * speedMultiplier;
     const MIN_VISIT_INTERVAL_MS = 4;
-    const MAX_VISIT_INTERVAL_MS = 30;
+    const MAX_VISIT_INTERVAL_MS = 30 * speedMultiplier;
     const visitInterval = Math.min(
       MAX_VISIT_INTERVAL_MS,
       Math.max(MIN_VISIT_INTERVAL_MS, TOTAL_VISIT_DURATION_MS / Math.max(visitSteps.length, 1))
     );
-    const PATH_CELL_INTERVAL_MS = 20;
+    const PATH_CELL_INTERVAL_MS = 20 * speedMultiplier;
 
     return new Promise((resolve) => {
       function drawNextVisit(index) {
@@ -312,6 +327,17 @@ document.addEventListener('DOMContentLoaded', () => {
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
   }
 
+  // #speed-selectの値からアニメーション時間の倍率を取得する（迷路タブの
+  // getSpeedMultiplierと同じ実装。DOMContentLoadedブロックが分かれている
+  // ため、ここでも同一の定義を持つ）。
+  function getSpeedMultiplier() {
+    const speedSelect = document.getElementById('speed-select');
+    const value = speedSelect ? speedSelect.value : 'normal';
+    if (value === 'slow') return 3;
+    if (value === 'fast') return 1;
+    return 1.5;
+  }
+
   // currentValuesの内容をバーチャートとして描画する。
   // highlightIndices（Set）に含まれるインデックスのバーはhighlightColorで、
   // それ以外は通常色（--color-main）で塗る。
@@ -356,9 +382,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // 複数ステップを1回の描画更新にまとめて適用することで、再描画の回数
   // 自体を一定数（maxTicks）以内に抑える。
   function animateSortSteps(steps, initialValues, maxValue) {
-    const MAX_TOTAL_DURATION_MS = 6000;
+    // 目標合計時間・tickIntervalの上限には#speed-selectの倍率を掛けて
+    // 速度選択を反映する。下限はちらつき・CPU負荷を避けるための別目的の
+    // 値なので倍率を掛けず据え置く。
+    const speedMultiplier = getSpeedMultiplier();
+    const MAX_TOTAL_DURATION_MS = 6000 * speedMultiplier;
     const MIN_TICK_INTERVAL_MS = 15;
-    const MAX_TICK_INTERVAL_MS = 60;
+    const MAX_TICK_INTERVAL_MS = 60 * speedMultiplier;
 
     const totalSteps = steps.length;
     if (totalSteps === 0) {
