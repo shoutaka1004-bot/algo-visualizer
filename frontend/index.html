@@ -47,7 +47,21 @@
 
     <section id="sort-panel" class="tab-panel">
       <h2>ソート</h2>
-      <p class="panel-placeholder">（フォーム・Canvas描画は今後のタスクで追加します）</p>
+      <form class="sort-form">
+        <div class="form-field">
+          <label for="sort-size">配列サイズ（要素数）</label>
+          <input type="number" id="sort-size" name="size" min="5" max="200" value="30" required>
+        </div>
+        <div class="form-field">
+          <label for="sort-algorithm-select">並び替えアルゴリズム</label>
+          <select id="sort-algorithm-select" name="algorithm">
+            <option value="bubble">バブルソート</option>
+            <option value="quick">クイックソート</option>
+            <option value="merge">マージソート</option>
+          </select>
+        </div>
+        <button type="button" id="start-sort-btn" class="cta-button">ソートを開始する</button>
+      </form>
     </section>
   </main>
 

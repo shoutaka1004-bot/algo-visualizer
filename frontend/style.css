@@ -99,7 +99,8 @@ body {
   color: var(--color-text);
 }
 
-.maze-form {
+.maze-form,
+.sort-form {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
