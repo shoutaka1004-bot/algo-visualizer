@@ -228,3 +228,188 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+// ソート実行（「ソートを開始する」→ /api/sort → バーチャートアニメーション）
+document.addEventListener('DOMContentLoaded', () => {
+  const sortSizeInput = document.getElementById('sort-size');
+  const sortAlgorithmSelect = document.getElementById('sort-algorithm-select');
+  const startSortBtn = document.getElementById('start-sort-btn');
+  const sortCanvas = document.getElementById('sort-canvas');
+
+  if (!sortSizeInput || !sortAlgorithmSelect || !startSortBtn || !sortCanvas) {
+    return;
+  }
+
+  const SORT_CANVAS_WIDTH = 760;
+  const SORT_CANVAS_HEIGHT = 320;
+  const BAR_GAP_RATIO = 0.1;
+  const VALUE_MIN = 1;
+  const VALUE_MAX = 100;
+
+  // ソート中に描画が参照する「現在表示中の配列」。APIは最終的なソート済み
+  // 配列そのものは返さず、compare/swap/overwriteのステップ列だけを返すため、
+  // ここでステップを1件ずつ適用しながら状態を再現する。
+  let currentValues = [];
+
+  function generateRandomValues(size) {
+    const values = [];
+    for (let i = 0; i < size; i += 1) {
+      values.push(Math.floor(Math.random() * (VALUE_MAX - VALUE_MIN + 1)) + VALUE_MIN);
+    }
+    return values;
+  }
+
+  // 16進カラーコードを指定の不透明度のrgba()文字列に変換する（迷路タブの
+  // hexToRgbaと同じ変換ロジック。配色を3系統に留めるため、ここでも
+  // --color-accentのアルファ値違いだけで状態を描き分ける）。
+  function hexToRgba(hex, alpha) {
+    const normalized = hex.replace('#', '');
+    const r = parseInt(normalized.substring(0, 2), 16);
+    const g = parseInt(normalized.substring(2, 4), 16);
+    const b = parseInt(normalized.substring(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+
+  // currentValuesの内容をバーチャートとして描画する。
+  // highlightIndices（Set）に含まれるインデックスのバーはhighlightColorで、
+  // それ以外は通常色（--color-main）で塗る。
+  function drawBars(values, maxValue, highlightIndices, highlightColor) {
+    sortCanvas.width = SORT_CANVAS_WIDTH;
+    sortCanvas.height = SORT_CANVAS_HEIGHT;
+
+    const ctx = sortCanvas.getContext('2d');
+    const rootStyle = getComputedStyle(document.documentElement);
+    const normalColor = rootStyle.getPropertyValue('--color-main').trim();
+
+    ctx.clearRect(0, 0, sortCanvas.width, sortCanvas.height);
+
+    const n = values.length;
+    if (n === 0) {
+      return;
+    }
+    const slotWidth = sortCanvas.width / n;
+    const barWidth = Math.max(1, slotWidth * (1 - BAR_GAP_RATIO));
+
+    for (let i = 0; i < n; i += 1) {
+      const barHeight = (values[i] / maxValue) * sortCanvas.height;
+      const isHighlighted = highlightIndices && highlightIndices.has(i);
+      ctx.fillStyle = isHighlighted ? highlightColor : normalColor;
+      ctx.fillRect(
+        i * slotWidth,
+        sortCanvas.height - barHeight,
+        barWidth,
+        barHeight
+      );
+    }
+  }
+
+  // ステップ列（compare/swap/overwrite）を、目標総時間内に収まるよう
+  // バッチ処理しながら順に適用し、Canvasを再描画するアニメーション。
+  //
+  // バブルソートは配列サイズ上限200・最悪ケース（降順に近い配列）だと
+  // 数万ステップに達しうる。1ステップ=1回の再描画（迷路タブの
+  // animateSolveStepsと同じ方式）をそのまま使うと、1ステップあたり
+  // 数msにクランプしても総時間が数分になりかねない。そのため、総時間の
+  // 上限（MAX_TOTAL_DURATION_MS）を固定し、ステップ数が多い場合は
+  // 複数ステップを1回の描画更新にまとめて適用することで、再描画の回数
+  // 自体を一定数（maxTicks）以内に抑える。
+  function animateSortSteps(steps, initialValues, maxValue) {
+    const MAX_TOTAL_DURATION_MS = 6000;
+    const MIN_TICK_INTERVAL_MS = 15;
+    const MAX_TICK_INTERVAL_MS = 60;
+
+    const totalSteps = steps.length;
+    if (totalSteps === 0) {
+      drawBars(initialValues, maxValue, null, null);
+      return Promise.resolve();
+    }
+
+    const maxTicks = Math.floor(MAX_TOTAL_DURATION_MS / MIN_TICK_INTERVAL_MS);
+    const stepsPerTick = Math.max(1, Math.ceil(totalSteps / maxTicks));
+    const tickCount = Math.ceil(totalSteps / stepsPerTick);
+    const tickInterval = Math.min(
+      MAX_TICK_INTERVAL_MS,
+      Math.max(MIN_TICK_INTERVAL_MS, MAX_TOTAL_DURATION_MS / tickCount)
+    );
+
+    const rootStyle = getComputedStyle(document.documentElement);
+    const accentHex = rootStyle.getPropertyValue('--color-accent').trim();
+    const compareColor = hexToRgba(accentHex, 0.45);
+    const changedColor = hexToRgba(accentHex, 1);
+
+    return new Promise((resolve) => {
+      function applyStep(step) {
+        if (step.type === 'compare') {
+          return { indices: new Set(step.indices), color: compareColor };
+        }
+        if (step.type === 'swap') {
+          const [a, b] = step.indices;
+          const tmp = currentValues[a];
+          currentValues[a] = currentValues[b];
+          currentValues[b] = tmp;
+          return { indices: new Set(step.indices), color: changedColor };
+        }
+        if (step.type === 'overwrite') {
+          currentValues[step.index] = step.value;
+          return { indices: new Set([step.index]), color: changedColor };
+        }
+        return { indices: new Set(), color: null };
+      }
+
+      function runTick(stepIndex) {
+        if (stepIndex >= totalSteps) {
+          // 完了後は、ハイライト無しの通常状態で最終描画する。
+          drawBars(currentValues, maxValue, null, null);
+          resolve();
+          return;
+        }
+
+        const end = Math.min(stepIndex + stepsPerTick, totalSteps);
+        let lastResult = { indices: new Set(), color: null };
+        for (let i = stepIndex; i < end; i += 1) {
+          lastResult = applyStep(steps[i]);
+        }
+
+        drawBars(currentValues, maxValue, lastResult.indices, lastResult.color);
+        setTimeout(() => runTick(end), tickInterval);
+      }
+
+      runTick(0);
+    });
+  }
+
+  startSortBtn.addEventListener('click', async () => {
+    const size = Number(sortSizeInput.value);
+    const algorithm = sortAlgorithmSelect.value;
+
+    const originalLabel = startSortBtn.textContent;
+    startSortBtn.disabled = true;
+    startSortBtn.textContent = 'ソート中…';
+
+    try {
+      currentValues = generateRandomValues(size);
+      const maxValue = Math.max(...currentValues, 1);
+      drawBars(currentValues, maxValue, null, null);
+
+      const response = await fetch('/api/sort', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ values: currentValues, algorithm }),
+      });
+
+      if (!response.ok) {
+        const errorBody = await response.json().catch(() => ({}));
+        console.error('ソートに失敗しました:', errorBody.error || response.status);
+        return;
+      }
+
+      const { steps } = await response.json();
+      await animateSortSteps(steps, currentValues, maxValue);
+    } catch (err) {
+      console.error('ソート中にエラーが発生しました:', err);
+    } finally {
+      startSortBtn.disabled = false;
+      startSortBtn.textContent = originalLabel;
+    }
+  });
+});
