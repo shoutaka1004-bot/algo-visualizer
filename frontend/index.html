@@ -2,11 +2,37 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Algo Visualizer</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Algo Visualizer</h1>
+  <header class="app-header">
+    <h1 class="app-title">Algo Visualizer</h1>
+    <p class="app-subtitle">迷路探索とソートのアルゴリズムを見て学べる可視化ツール</p>
+  </header>
+
+  <nav class="tab-bar" role="tablist" aria-label="表示切り替え">
+    <button type="button" class="tab-button is-active" data-tab="maze">迷路</button>
+    <button type="button" class="tab-button" data-tab="sort">ソート</button>
+  </nav>
+
+  <main class="tab-content">
+    <section id="maze-panel" class="tab-panel">
+      <h2>迷路探索</h2>
+      <p class="panel-placeholder">（フォーム・Canvas描画は今後のタスクで追加します）</p>
+    </section>
+
+    <section id="sort-panel" class="tab-panel">
+      <h2>ソート</h2>
+      <p class="panel-placeholder">（フォーム・Canvas描画は今後のタスクで追加します）</p>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <p>Algo Visualizer — 学習用ポートフォリオアプリ</p>
+  </footer>
+
   <script src="main.js"></script>
 </body>
 </html>

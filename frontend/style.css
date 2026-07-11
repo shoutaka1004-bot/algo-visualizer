@@ -1,1 +1,107 @@
-/* スタイルは今後のタスクで実装 */
+/*
+  配色（3系統に限定。BRIEF.md 4-6節の教訓に準拠）
+  - ベース: 背景色（生成り色）とカード背景（白）
+  - メイン: ヘッダー背景・見出し・アクティブタブの背景
+  - アクセント: アクティブタブの下線などの小さな強調（将来のCTAボタンにも使用予定）
+  コントラスト比（WCAG相対輝度式で計算、いずれも4.5:1以上）
+  - 本文文字 #2B2B2B on ベース背景 #FDF6EC: 13.19:1
+  - 本文文字 #2B2B2B on カード背景 #FFFFFF: 14.16:1
+  - 白文字 #FFFFFF on メイン背景 #1F7A74: 5.13:1
+  - メイン文字 #1F7A74 on ベース背景 #FDF6EC: 4.78:1
+*/
+:root {
+  --color-base-bg: #FDF6EC;
+  --color-base-card: #FFFFFF;
+  --color-main: #1F7A74;
+  --color-accent: #FF9F45;
+  --color-text: #2B2B2B;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-base-bg);
+  color: var(--color-text);
+  font-family: "Hiragino Sans", "Yu Gothic", "Segoe UI", sans-serif;
+  line-height: 1.6;
+}
+
+.app-header {
+  background-color: var(--color-main);
+  color: #FFFFFF;
+  padding: 2rem 1.5rem 1.5rem;
+  text-align: center;
+}
+
+.app-title {
+  margin: 0 0 0.5rem;
+  font-size: 2rem;
+}
+
+.app-subtitle {
+  margin: 0;
+  font-size: 1rem;
+  color: #FFFFFF;
+}
+
+.tab-bar {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  max-width: 960px;
+  margin: 1.5rem auto 0;
+  padding: 0 1.5rem;
+}
+
+.tab-button {
+  border: none;
+  border-radius: 999px;
+  padding: 0.6rem 1.75rem;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: var(--color-base-card);
+  color: var(--color-main);
+  border-bottom: 3px solid transparent;
+}
+
+.tab-button.is-active {
+  background-color: var(--color-main);
+  color: #FFFFFF;
+  border-bottom: 3px solid var(--color-accent);
+}
+
+.tab-content {
+  max-width: 960px;
+  margin: 1.5rem auto;
+  padding: 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.tab-panel {
+  background-color: var(--color-base-card);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.tab-panel h2 {
+  margin-top: 0;
+  color: var(--color-main);
+}
+
+.panel-placeholder {
+  color: var(--color-text);
+}
+
+.app-footer {
+  text-align: center;
+  padding: 1.5rem;
+  color: var(--color-text);
+  font-size: 0.875rem;
+}
