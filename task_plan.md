@@ -7,48 +7,53 @@
 
 ## レイヤー1: 環境構築・初期化
 
-- [ ] タスク1: Flaskプロジェクトの雛形を作成する（`backend/app.py`, `backend/requirements.txt`。`GET /`が`Algo Visualizer`を含むプレースホルダーHTMLを返す）。検証: `curl http://localhost:5000/`が200・本文に`Algo Visualizer`を含む。
-- [ ] タスク2: フロントエンド静的ファイルの雛形を作成する（`frontend/index.html`, `frontend/style.css`, `frontend/main.js`。プレースホルダー内容のみ、Flaskとの連携はまだ行わない）。検証: 各ファイルが存在し、`index.html`をブラウザで直接開くとプレースホルダーの見出しが表示される。
-- [ ] タスク3: `backend/app.py`を変更し、`frontend/`配下を静的配信するようにする（`GET /`が`frontend/index.html`を返すようにする）。検証: `curl http://localhost:5000/`のレスポンス本文が`frontend/index.html`の内容と一致する。
+- [x] タスク1: Flaskプロジェクトの雛形を作成する（`backend/app.py`, `backend/requirements.txt`。`GET /`が`Algo Visualizer`を含むプレースホルダーHTMLを返す）。検証: `curl http://localhost:5000/`が200・本文に`Algo Visualizer`を含む。
+- [x] タスク2: フロントエンド静的ファイルの雛形を作成する（`frontend/index.html`, `frontend/style.css`, `frontend/main.js`。プレースホルダー内容のみ、Flaskとの連携はまだ行わない）。検証: 各ファイルが存在し、`index.html`をブラウザで直接開くとプレースホルダーの見出しが表示される。
+- [x] タスク3: `backend/app.py`を変更し、`frontend/`配下を静的配信するようにする（`GET /`が`frontend/index.html`を返すようにする）。検証: `curl http://localhost:5000/`のレスポンス本文が`frontend/index.html`の内容と一致する。
 
 ## レイヤー2: データ構造・共通フォーマット定義
 
-- [ ] タスク4: 迷路のグリッド表現とセルを`backend/maze/grid.py`に実装する（幅・高さを指定して初期化、壁の有無を持つセル）。検証: `cd backend && pytest tests/test_grid.py`が通る。
-- [ ] タスク5: アルゴリズムの実行ステップを記録する共通フォーマットを`backend/steps.py`に実装する（例: `{"type": "visit"/"path"/"compare"/"swap", ...}`のリストを組み立てるヘルパー、JSON化可能であること）。検証: `cd backend && pytest tests/test_steps.py`が通る。
+- [x] タスク4: 迷路のグリッド表現とセルを`backend/maze/grid.py`に実装する（幅・高さを指定して初期化、壁の有無を持つセル）。検証: `cd backend && pytest tests/test_grid.py`が通る。
+- [x] タスク5: アルゴリズムの実行ステップを記録する共通フォーマットを`backend/steps.py`に実装する（例: `{"type": "visit"/"path"/"compare"/"swap", ...}`のリストを組み立てるヘルパー、JSON化可能であること）。検証: `cd backend && pytest tests/test_steps.py`が通る。
 
 ## レイヤー3: ロジック層（アルゴリズム実装）
 
-- [ ] タスク6: 迷路生成アルゴリズム（穴掘り法）を`backend/maze/generator.py`に実装する。検証: `cd backend && pytest tests/test_generator.py`が通る（生成した迷路の全セルが連結していることを確認するテストを含む）。
-- [ ] タスク7: 迷路探索BFSを`backend/maze/solvers/bfs.py`に実装し、`steps.py`のフォーマットでステップ（訪問順・最終経路）を返す。検証: `cd backend && pytest tests/test_solvers.py -k bfs`が通る（既知の小さな迷路で最短経路長が正しいことを確認）。
-- [ ] タスク8: 迷路探索Dijkstra法を`backend/maze/solvers/dijkstra.py`に実装する。検証: `cd backend && pytest tests/test_solvers.py -k dijkstra`が通る（同じテスト迷路でBFSと同じ最短経路長になることを確認）。
-- [ ] タスク9: 迷路探索A*を`backend/maze/solvers/astar.py`に実装する（マンハッタン距離ヒューリスティック）。検証: `cd backend && pytest tests/test_solvers.py -k astar`が通る（同じテスト迷路で最短経路長が一致することを確認）。
-- [ ] タスク10: バブルソートを`backend/sorting/bubble.py`に実装し、ステップ（比較・交換）を返す。検証: `cd backend && pytest tests/test_sorting.py -k bubble`が通る（ランダム配列のソート結果が`sorted()`と一致することを確認）。
-- [ ] タスク11: クイックソートを`backend/sorting/quick.py`に実装する。検証: `cd backend && pytest tests/test_sorting.py -k quick`が通る。
-- [ ] タスク12: マージソートを`backend/sorting/merge.py`に実装する。検証: `cd backend && pytest tests/test_sorting.py -k merge`が通る。
+- [x] タスク6: 迷路生成アルゴリズム（穴掘り法）を`backend/maze/generator.py`に実装する。検証: `cd backend && pytest tests/test_generator.py`が通る（生成した迷路の全セルが連結していることを確認するテストを含む）。
+- [x] タスク7: 迷路探索BFSを`backend/maze/solvers/bfs.py`に実装し、`steps.py`のフォーマットでステップ（訪問順・最終経路）を返す。検証: `cd backend && pytest tests/test_solvers.py -k bfs`が通る（既知の小さな迷路で最短経路長が正しいことを確認）。
+- [x] タスク8: 迷路探索Dijkstra法を`backend/maze/solvers/dijkstra.py`に実装する。検証: `cd backend && pytest tests/test_solvers.py -k dijkstra`が通る（同じテスト迷路でBFSと同じ最短経路長になることを確認）。
+- [x] タスク9: 迷路探索A*を`backend/maze/solvers/astar.py`に実装する（マンハッタン距離ヒューリスティック）。検証: `cd backend && pytest tests/test_solvers.py -k astar`が通る（同じテスト迷路で最短経路長が一致することを確認）。
+- [x] タスク10: バブルソートを`backend/sorting/bubble.py`に実装し、ステップ（比較・交換）を返す。検証: `cd backend && pytest tests/test_sorting.py -k bubble`が通る（ランダム配列のソート結果が`sorted()`と一致することを確認）。
+- [x] タスク11: クイックソートを`backend/sorting/quick.py`に実装する。検証: `cd backend && pytest tests/test_sorting.py -k quick`が通る。
+- [x] タスク12: マージソートを`backend/sorting/merge.py`に実装する。検証: `cd backend && pytest tests/test_sorting.py -k merge`が通る。
 
 ## レイヤー4: API層
 
-- [ ] タスク13: 迷路生成APIエンドポイント`POST /api/maze`（幅・高さを受け取り迷路とスタート/ゴール座標を返す）を`backend/app.py`に実装する。検証: サーバー起動後`curl -X POST http://localhost:5000/api/maze -d '{"width":10,"height":10}' -H "Content-Type: application/json"`が200とJSON構造（迷路データ・スタート/ゴール座標）を返すことを確認。
-- [ ] タスク14: 迷路探索APIエンドポイント`POST /api/maze/solve`（迷路とアルゴリズム名を受け取りステップ列を返す）を実装する。検証: `curl`で呼び出し200とステップ列のJSON構造が返ることを確認。
-- [ ] タスク15: ソートAPIエンドポイント`POST /api/sort`（配列とアルゴリズム名を受け取りステップ列を返す）を実装する。検証: `curl`で呼び出し200とステップ列が返ることを確認。
-- [ ] タスク16: 上記3エンドポイント共通の不正入力エラーハンドリングを実装する（存在しないアルゴリズム名、範囲外の幅・高さなどに対して`{"error": "平易な文言"}`とステータス400を返す）。検証: `curl`で不正なリクエストを送りステータス400と`error`フィールドを確認。
+- [x] タスク13: 迷路生成APIエンドポイント`POST /api/maze`（幅・高さを受け取り迷路とスタート/ゴール座標を返す）を`backend/app.py`に実装する。検証: サーバー起動後`curl -X POST http://localhost:5000/api/maze -d '{"width":10,"height":10}' -H "Content-Type: application/json"`が200とJSON構造（迷路データ・スタート/ゴール座標）を返すことを確認。
+- [x] タスク14: 迷路探索APIエンドポイント`POST /api/maze/solve`（迷路とアルゴリズム名を受け取りステップ列を返す）を実装する。検証: `curl`で呼び出し200とステップ列のJSON構造が返ることを確認。
+- [x] タスク15: ソートAPIエンドポイント`POST /api/sort`（配列とアルゴリズム名を受け取りステップ列を返す）を実装する。検証: `curl`で呼び出し200とステップ列が返ることを確認。
+- [x] タスク16: 上記3エンドポイント共通の不正入力エラーハンドリングを実装する。タスク13〜15のレビューで洗い出した以下の不正入力パターンを全て`{"error": "平易な文言"}`・ステータス400に正規化すること（現状はいずれも生のPythonトレースバックを含む500になることを確認済み）。
+  - `POST /api/maze`: `width`/`height`が欠損・数値以外の型・範囲外（3未満）の場合。**加えて、上限も新設する（親AI判断: 3以上101以下。理由: `generate_maze`自体は反復DFSのため大きな迷路でもRecursionErrorは起きないが、あまり大きな迷路はCanvas描画・JSON転送量の観点でUXとして不適切なため）**。タスク19（迷路タブの入力フォーム）にも同じ上限をUI側で反映すること。
+  - `POST /api/maze/solve`: `algorithm`が`bfs`/`dijkstra`/`astar`以外・欠損の場合。`grid`が欠損・空配列・行の長さが不揃い（ジャグ配列）・要素が真偽値以外の場合。
+  - `POST /api/sort`: `algorithm`が`bubble`/`quick`/`merge`以外・欠損の場合。`values`が欠損・配列でない・要素に数値以外が含まれる場合。**配列サイズにも上限（例: 200要素）を設け、超過時は400を返すこと**（`sort_quick`が再帰実装のため、997要素以上の既にソート済み配列でRecursionErrorになることをタスク11レビューで確認済み。加えて、それだけの本数のバーを1画面に描画してもUXとして見づらいため、上限自体は視覚的な観点からも妥当）。
+
+  検証: `curl`で上記の不正入力パターンを一通り送り、いずれも500ではなく400・`error`フィールドを含むレスポンスになることを確認する。
 
 ## レイヤー5: UI層
 
-- [ ] タスク17: ページ全体のレイアウトと明るくカジュアルな配色を実装する（`frontend/index.html`の構造・`frontend/style.css`。配色はベース・メイン・アクセントの3系統以内、コントラスト比4.5:1以上。「迷路」「ソート」タブの見た目だけ用意し、切り替えロジックはまだ実装しない＝両方常に表示された状態でよい）。検証: ブラウザで開きレイアウト・配色を目視確認し、背景色と文字色のRGB値からコントラスト比を計算して4.5:1以上であることを確認する。
-- [ ] タスク18: 「迷路」「ソート」タブを切り替えるJSロジックを実装する（クリックで表示/非表示を切り替えるのみ）。検証: ブラウザでタブをクリックし表示が切り替わることを確認する。
-- [ ] タスク19: 迷路タブに幅・高さ入力フォームと「迷路を生成する」ボタン（主CTA）のUIのみを追加する（まだAPI呼び出し・Canvas描画は無い、静的な見た目のみ）。検証: ブラウザで開き、フォームとボタンが表示されることを目視確認する。
-- [ ] タスク20: 「迷路を生成する」ボタン押下時に`/api/maze`を呼び出し、結果をCanvasに迷路として描画するJSロジックを実装する。検証: ブラウザで実際に迷路を生成し、Canvas上に描画されることを確認する。
-- [ ] タスク21: 迷路タブに探索アルゴリズム選択（BFS/Dijkstra/A*のセレクトボックス）と「探索を開始する」ボタンのUIのみを追加する（まだAPI呼び出しは無い）。検証: ブラウザで開きセレクトボックスとボタンが表示されることを目視確認する。
-- [ ] タスク22: 「探索を開始する」ボタン押下時に`/api/maze/solve`を呼び出し、Canvas上でステップ列をアニメーション表示するJSロジックを実装する（ボタンはアニメーション中disabledにしローディング表示を行う）。検証: BFS/Dijkstra/A*それぞれを選択し、アニメーションが最後まで再生されることを確認する。
-- [ ] タスク23: ソートタブに配列サイズ入力とアルゴリズム選択（バブル/クイック/マージ）、「ソートを開始する」ボタンのUIのみを追加する（まだAPI呼び出しは無い）。検証: ブラウザで開き各要素が表示されることを目視確認する。
-- [ ] タスク24: 「ソートを開始する」ボタン押下時に`/api/sort`を呼び出し、バーチャート形式でステップ列をアニメーション表示するJSロジックを実装する（ボタンはアニメーション中disabled）。検証: バブル/クイック/マージそれぞれを選択し、ソートが完了するまでアニメーションされることを確認する。
-- [ ] タスク25: APIエラー時に、技術的な詳細を出さない平易なエラーメッセージを画面上に表示するUIを実装する。検証: 不正なリクエストが起きる操作（例: 極端に大きい幅・高さを指定する）を行いエラー表示を確認する。
+- [x] タスク17: ページ全体のレイアウトと明るくカジュアルな配色を実装する（`frontend/index.html`の構造・`frontend/style.css`。配色はベース・メイン・アクセントの3系統以内、コントラスト比4.5:1以上。「迷路」「ソート」タブの見た目だけ用意し、切り替えロジックはまだ実装しない＝両方常に表示された状態でよい）。検証: ブラウザで開きレイアウト・配色を目視確認し、背景色と文字色のRGB値からコントラスト比を計算して4.5:1以上であることを確認する。
+- [x] タスク18: 「迷路」「ソート」タブを切り替えるJSロジックを実装する（クリックで表示/非表示を切り替えるのみ）。検証: ブラウザでタブをクリックし表示が切り替わることを確認する。
+- [x] タスク19: 迷路タブに幅・高さ入力フォームと「迷路を生成する」ボタン（主CTA）のUIのみを追加する（まだAPI呼び出し・Canvas描画は無い、静的な見た目のみ）。幅・高さの入力欄はタスク16のAPI側上限（3以上101以下）と矛盾しないよう、入力欄自体にも同じ上限を設けること。検証: ブラウザで開き、フォームとボタンが表示されることを目視確認する。
+- [x] タスク20: 「迷路を生成する」ボタン押下時に`/api/maze`を呼び出し、結果をCanvasに迷路として描画するJSロジックを実装する。検証: ブラウザで実際に迷路を生成し、Canvas上に描画されることを確認する。
+- [x] タスク21: 迷路タブに探索アルゴリズム選択（BFS/Dijkstra/A*のセレクトボックス）と「探索を開始する」ボタンのUIのみを追加する（まだAPI呼び出しは無い）。検証: ブラウザで開きセレクトボックスとボタンが表示されることを目視確認する。
+- [x] タスク22: 「探索を開始する」ボタン押下時に`/api/maze/solve`を呼び出し、Canvas上でステップ列をアニメーション表示するJSロジックを実装する（ボタンはアニメーション中disabledにしローディング表示を行う）。検証: BFS/Dijkstra/A*それぞれを選択し、アニメーションが最後まで再生されることを確認する。
+- [x] タスク23: ソートタブに配列サイズ入力とアルゴリズム選択（バブル/クイック/マージ）、「ソートを開始する」ボタンのUIのみを追加する（まだAPI呼び出しは無い）。配列サイズ入力はタスク16のAPI側上限（例: 200要素）と矛盾しないよう、入力欄自体にも同じ上限を設けること。検証: ブラウザで開き各要素が表示されることを目視確認する。
+- [x] タスク24: 「ソートを開始する」ボタン押下時に`/api/sort`を呼び出し、バーチャート形式でステップ列をアニメーション表示するJSロジックを実装する（ボタンはアニメーション中disabled）。`compare`・`swap`に加え、マージソートが使う`overwrite`（指定インデックスのバーの値を直接書き換える）ステップにも対応すること。検証: バブル/クイック/マージそれぞれを選択し、ソートが完了するまでアニメーションされることを確認する。
+- [x] タスク25: APIエラー時に、技術的な詳細を出さない平易なエラーメッセージを画面上に表示するUIを実装する。検証: 不正なリクエストが起きる操作（例: 極端に大きい幅・高さを指定する）を行いエラー表示を確認する。
 
 ## レイヤー6: 結合テスト・仕上げ
 
-- [ ] タスク26: （CLI/ヘッドレス自動起動確認）ヘルスチェック用に`GET /api/health`エンドポイントを追加し、`python backend/app.py`起動後`curl http://localhost:5000/api/health`が200を返すことを確認する。検証: 上記curlコマンドの実行結果。
-- [ ] タスク27: デプロイ用設定ファイル（`Procfile`、`requirements.txt`への`gunicorn`追加）を作成する。検証: ローカルで`gunicorn app:app`（`backend/`ディレクトリ内）を使った本番想定コマンドでサーバーを起動し、`curl`でトップページが200を返すことを確認する。
+- [x] タスク26: （CLI/ヘッドレス自動起動確認）ヘルスチェック用に`GET /api/health`エンドポイントを追加し、`python backend/app.py`起動後`curl http://localhost:5000/api/health`が200を返すことを確認する。検証: 上記curlコマンドの実行結果。
+- [x] タスク27: デプロイ用設定ファイル（`Procfile`、`requirements.txt`への`gunicorn`追加）を作成する。検証: ローカルで`gunicorn app:app`（`backend/`ディレクトリ内）を使った本番想定コマンドでサーバーを起動し、`curl`でトップページが200を返すことを確認する。（Windows開発機ではgunicorn自体が`fcntl`依存のため起動不可なことが判明。WSGIテストクライアント経由の代替検証で200を確認済み。実機起動確認はタスク28のRender実デプロイ時に行う）
 
 ## 親AI（人間）担当タスク
 
