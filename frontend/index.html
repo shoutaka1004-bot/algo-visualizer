@@ -10,6 +10,14 @@
   <header class="app-header">
     <h1 class="app-title">Algo Visualizer</h1>
     <p class="app-subtitle">迷路探索とソートのアルゴリズムを見て学べる可視化ツール</p>
+    <div class="speed-control">
+      <label for="speed-select">アニメーション速度</label>
+      <select id="speed-select" name="speed">
+        <option value="slow">ゆっくり</option>
+        <option value="normal" selected>ふつう</option>
+        <option value="fast">はやい</option>
+      </select>
+    </div>
   </header>
 
   <nav class="tab-bar" role="tablist" aria-label="表示切り替え">
@@ -41,6 +49,7 @@
             <option value="dijkstra">ダイクストラ法</option>
             <option value="astar">A*探索</option>
           </select>
+          <p id="algorithm-description" class="algorithm-description">スタート地点から近い順に、一歩ずつ全方向を均等に調べていく方法です。全ての移動が同じコストのときに、必ず最短経路を見つけられます。</p>
         </div>
         <button type="button" id="solve-maze-btn" class="secondary-button">探索を開始する</button>
       </form>
@@ -61,6 +70,7 @@
             <option value="quick">クイックソート</option>
             <option value="merge">マージソート</option>
           </select>
+          <p id="sort-algorithm-description" class="algorithm-description">隣り合う2つの値を比較し、順番が逆なら入れ替える、という操作を配列の端から端まで繰り返す方法です。仕組みが単純な分、要素数が多いと時間がかかります。</p>
         </div>
         <button type="button" id="start-sort-btn" class="cta-button">ソートを開始する</button>
       </form>

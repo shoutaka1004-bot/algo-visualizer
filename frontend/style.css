@@ -36,6 +36,12 @@ body {
   text-align: center;
 }
 
+.algorithm-description {
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+  color: var(--color-text);
+}
+
 .app-title {
   margin: 0 0 0.5rem;
   font-size: 2rem;
@@ -45,6 +51,28 @@ body {
   margin: 0;
   font-size: 1rem;
   color: #FFFFFF;
+}
+
+.speed-control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.speed-control label {
+  font-size: 0.875rem;
+  color: #FFFFFF;
+}
+
+.speed-control select {
+  padding: 0.5rem;
+  border: 1px solid #CCCCCC;
+  border-radius: 6px;
+  font-size: 1rem;
+  color: var(--color-text);
+  background-color: var(--color-base-card);
 }
 
 .tab-bar {

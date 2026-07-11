@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const algorithmSelect = document.getElementById('algorithm-select');
   const solveMazeBtn = document.getElementById('solve-maze-btn');
   const mazeErrorEl = document.getElementById('maze-error');
+  const algorithmDescriptionEl = document.getElementById('algorithm-description');
 
   if (
     !generateMazeBtn ||
@@ -44,6 +45,21 @@ document.addEventListener('DOMContentLoaded', () => {
     !mazeErrorEl
   ) {
     return;
+  }
+
+  // 選択中の探索アルゴリズムに応じた短い説明文（タスク32、フィードバック対応）。
+  // #algorithm-descriptionが無くても迷路の生成・探索という主要機能は
+  // 止めたくないため、algorithmDescriptionElの有無で個別にガードする。
+  const algorithmDescriptions = {
+    bfs: 'スタート地点から近い順に、一歩ずつ全方向を均等に調べていく方法です。全ての移動が同じコストのときに、必ず最短経路を見つけられます。',
+    dijkstra: 'スタート地点から「ここまでの合計コストが一番小さいマス」を優先して調べていく方法です。今回の迷路は全マスの移動コストが同じなのでBFSと同じ結果になりますが、コストが異なる道にも対応できる汎用的な方法です。',
+    astar: 'ゴールまでの距離の見積もり（ヒューリスティック）を使い、ゴールに近づきそうな方向を優先して調べる方法です。BFSやダイクストラ法より無駄な探索が少なく、同じ最短経路をより効率的に見つけられます。',
+  };
+
+  if (algorithmDescriptionEl) {
+    algorithmSelect.addEventListener('change', () => {
+      algorithmDescriptionEl.textContent = algorithmDescriptions[algorithmSelect.value] || '';
+    });
   }
 
   // 技術的な詳細（例外名・HTTPステータスコード）を画面に出さず、次にとるべき
@@ -107,6 +123,17 @@ document.addEventListener('DOMContentLoaded', () => {
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
   }
 
+  // #speed-selectの値からアニメーション時間の倍率を取得する。
+  // slow=3, normal=1.5, fast=1。要素が見つからない場合や想定外の値の場合は
+  // 既定値の'normal'(1.5)として扱う。
+  function getSpeedMultiplier() {
+    const speedSelect = document.getElementById('speed-select');
+    const value = speedSelect ? speedSelect.value : 'normal';
+    if (value === 'slow') return 3;
+    if (value === 'fast') return 1;
+    return 1.5;
+  }
+
   // 探索ステップ列（visit → 最後にpath）をCanvas上にアニメーション表示する。
   // 離散的な1マスずつの描画なので、requestAnimationFrameで毎フレームの経過時間を
   // 蓄積して間引くよりも、setTimeoutの再帰呼び出しでステップごとに任意の待機時間を
@@ -124,14 +151,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // 迷路が大きく数百ステップになりうるため、visit全体の目標合計時間から
     // 1ステップあたりの間隔を逆算する（大きい迷路ほど描画に時間がかかるのは
     // 自然な挙動として許容し、下限4ms・上限30msでクランプする）。
-    const TOTAL_VISIT_DURATION_MS = 2500;
+    // 上限・目標合計時間・pathの固定間隔には#speed-selectの倍率を掛けて
+    // 速度選択を反映する。下限はちらつき・CPU負荷を避けるための別目的の
+    // 値なので倍率を掛けず据え置く。
+    const speedMultiplier = getSpeedMultiplier();
+    const TOTAL_VISIT_DURATION_MS = 2500 * speedMultiplier;
     const MIN_VISIT_INTERVAL_MS = 4;
-    const MAX_VISIT_INTERVAL_MS = 30;
+    const MAX_VISIT_INTERVAL_MS = 30 * speedMultiplier;
     const visitInterval = Math.min(
       MAX_VISIT_INTERVAL_MS,
       Math.max(MIN_VISIT_INTERVAL_MS, TOTAL_VISIT_DURATION_MS / Math.max(visitSteps.length, 1))
     );
-    const PATH_CELL_INTERVAL_MS = 20;
+    const PATH_CELL_INTERVAL_MS = 20 * speedMultiplier;
 
     return new Promise((resolve) => {
       function drawNextVisit(index) {
@@ -265,9 +296,25 @@ document.addEventListener('DOMContentLoaded', () => {
   const startSortBtn = document.getElementById('start-sort-btn');
   const sortCanvas = document.getElementById('sort-canvas');
   const sortErrorEl = document.getElementById('sort-error');
+  const sortAlgorithmDescriptionEl = document.getElementById('sort-algorithm-description');
 
   if (!sortSizeInput || !sortAlgorithmSelect || !startSortBtn || !sortCanvas || !sortErrorEl) {
     return;
+  }
+
+  // 選択中の並び替えアルゴリズムに応じた短い説明文（タスク33、迷路タブと同じパターン）。
+  // #sort-algorithm-descriptionが無くてもソートという主要機能は止めたくないため、
+  // sortAlgorithmDescriptionElの有無で個別にガードする。
+  const sortAlgorithmDescriptions = {
+    bubble: '隣り合う2つの値を比較し、順番が逆なら入れ替える、という操作を配列の端から端まで繰り返す方法です。仕組みが単純な分、要素数が多いと時間がかかります。',
+    quick: '基準となる値（ピボット）を1つ選び、それより小さい値・大きい値に配列を分割することを繰り返す方法です。多くの場合バブルソートより高速です。',
+    merge: '配列を半分に分割することを繰り返して十分小さくしたあと、整列済みの小さな配列同士を合体（マージ）させながら1つに戻していく方法です。データの並び方に関わらず安定した速さで処理できます。',
+  };
+
+  if (sortAlgorithmDescriptionEl) {
+    sortAlgorithmSelect.addEventListener('change', () => {
+      sortAlgorithmDescriptionEl.textContent = sortAlgorithmDescriptions[sortAlgorithmSelect.value] || '';
+    });
   }
 
   // 迷路タブと同じ表示・非表示ロジック（BRIEF.md 4-6節の教訓に準拠）。
@@ -310,6 +357,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const g = parseInt(normalized.substring(2, 4), 16);
     const b = parseInt(normalized.substring(4, 6), 16);
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+
+  // #speed-selectの値からアニメーション時間の倍率を取得する（迷路タブの
+  // getSpeedMultiplierと同じ実装。DOMContentLoadedブロックが分かれている
+  // ため、ここでも同一の定義を持つ）。
+  function getSpeedMultiplier() {
+    const speedSelect = document.getElementById('speed-select');
+    const value = speedSelect ? speedSelect.value : 'normal';
+    if (value === 'slow') return 3;
+    if (value === 'fast') return 1;
+    return 1.5;
   }
 
   // currentValuesの内容をバーチャートとして描画する。
@@ -356,9 +414,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // 複数ステップを1回の描画更新にまとめて適用することで、再描画の回数
   // 自体を一定数（maxTicks）以内に抑える。
   function animateSortSteps(steps, initialValues, maxValue) {
-    const MAX_TOTAL_DURATION_MS = 6000;
+    // 目標合計時間・tickIntervalの上限には#speed-selectの倍率を掛けて
+    // 速度選択を反映する。下限はちらつき・CPU負荷を避けるための別目的の
+    // 値なので倍率を掛けず据え置く。
+    const speedMultiplier = getSpeedMultiplier();
+    const MAX_TOTAL_DURATION_MS = 6000 * speedMultiplier;
     const MIN_TICK_INTERVAL_MS = 15;
-    const MAX_TICK_INTERVAL_MS = 60;
+    const MAX_TICK_INTERVAL_MS = 60 * speedMultiplier;
 
     const totalSteps = steps.length;
     if (totalSteps === 0) {
