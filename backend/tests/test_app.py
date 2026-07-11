@@ -37,3 +37,32 @@ def test_create_maze_rejects_non_json_body(client):
     )
     assert response.status_code == 400
     assert "error" in response.get_json()
+
+
+def test_solve_maze_returns_expected_structure(client):
+    maze = client.post("/api/maze", json={"width": 9, "height": 9}).get_json()
+
+    response = client.post(
+        "/api/maze/solve",
+        json={
+            "width": maze["width"],
+            "height": maze["height"],
+            "grid": maze["grid"],
+            "algorithm": "bfs",
+        },
+    )
+    assert response.status_code == 200
+
+    data = response.get_json()
+    assert "steps" in data
+    steps = data["steps"]
+    assert isinstance(steps, list)
+    assert len(steps) > 0
+    assert all("type" in step for step in steps)
+    # visit/pathの表現規約（単一座標はx/y、複数座標は[x, y]配列のリスト）を
+    # 満たしているかも合わせて確認する。
+    assert any(step["type"] == "visit" for step in steps)
+    path_steps = [step for step in steps if step["type"] == "path"]
+    assert len(path_steps) == 1
+    assert path_steps[0]["cells"][0] == [0, 0]
+    assert path_steps[0]["cells"][-1] == [maze["width"] - 1, maze["height"] - 1]
