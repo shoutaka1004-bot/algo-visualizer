@@ -20,7 +20,18 @@
   <main class="tab-content">
     <section id="maze-panel" class="tab-panel">
       <h2>迷路探索</h2>
-      <p class="panel-placeholder">（フォーム・Canvas描画は今後のタスクで追加します）</p>
+      <form class="maze-form">
+        <div class="form-field">
+          <label for="maze-width">幅（マス数）</label>
+          <input type="number" id="maze-width" name="width" min="3" max="101" value="21" required>
+        </div>
+        <div class="form-field">
+          <label for="maze-height">高さ（マス数）</label>
+          <input type="number" id="maze-height" name="height" min="3" max="101" value="21" required>
+        </div>
+        <button type="button" id="generate-maze-btn" class="cta-button">迷路を生成する</button>
+      </form>
+      <p class="panel-placeholder">（探索アルゴリズムの選択とCanvas描画は今後のタスクで追加します）</p>
     </section>
 
     <section id="sort-panel" class="tab-panel">
