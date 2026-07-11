@@ -1,0 +1,73 @@
+import random
+
+from sorting.bubble import sort_bubble
+
+
+def _apply_steps(values, steps):
+    """`compare`/`swap`ステップを`values`のコピーに順に適用し、最終状態を返す。
+
+    `swap`ステップのみが実際に配列の状態を変える（`compare`は観測のみ）。
+    フロントエンド側の再構築ロジックを模したヘルパー。
+    """
+    result = list(values)
+    for step in steps:
+        if step["type"] == "swap":
+            i, j = step["indices"]
+            result[i], result[j] = result[j], result[i]
+    return result
+
+
+def test_sort_bubble_returns_only_compare_and_swap_steps():
+    steps = sort_bubble([3, 1, 2])
+    types = {step["type"] for step in steps}
+    assert types <= {"compare", "swap"}
+    assert any(step["type"] == "compare" for step in steps)
+    assert any(step["type"] == "swap" for step in steps)
+
+
+def test_sort_bubble_steps_reconstruct_sorted_array():
+    values = [3, 1, 2]
+    steps = sort_bubble(values)
+    assert _apply_steps(values, steps) == sorted(values)
+
+
+def test_sort_bubble_does_not_mutate_input():
+    values = [5, 4, 3, 2, 1]
+    original = list(values)
+    sort_bubble(values)
+    assert values == original
+
+
+def test_sort_bubble_already_sorted_has_no_swaps():
+    steps = sort_bubble([1, 2, 3, 4])
+    assert all(step["type"] != "swap" for step in steps)
+
+
+def test_sort_bubble_reverse_order():
+    values = [5, 4, 3, 2, 1]
+    steps = sort_bubble(values)
+    assert _apply_steps(values, steps) == sorted(values)
+
+
+def test_sort_bubble_handles_duplicates():
+    values = [3, 1, 3, 2, 1]
+    steps = sort_bubble(values)
+    assert _apply_steps(values, steps) == sorted(values)
+
+
+def test_sort_bubble_empty_list():
+    steps = sort_bubble([])
+    assert steps == []
+
+
+def test_sort_bubble_single_element():
+    steps = sort_bubble([42])
+    assert all(step["type"] != "swap" for step in steps)
+    assert _apply_steps([42], steps) == [42]
+
+
+def test_sort_bubble_random_array_matches_builtin_sorted():
+    rng = random.Random(12345)
+    values = [rng.randint(-100, 100) for _ in range(30)]
+    steps = sort_bubble(values)
+    assert _apply_steps(values, steps) == sorted(values)
