@@ -84,3 +84,54 @@ def test_generation_is_deterministic_with_same_seed():
     grid_a = generate_maze(9, 9, rng=random.Random(42))
     grid_b = generate_maze(9, 9, rng=random.Random(42))
     assert _passage_cells(grid_a) == _passage_cells(grid_b)
+
+
+def _render_ascii(grid):
+    """デバッグ用にGridをASCIIアート（'.'=通路, '#'=壁）へ変換する。"""
+    lines = []
+    for y in range(grid.height):
+        row = "".join(
+            "." if not grid.get_cell(x, y).is_wall else "#"
+            for x in range(grid.width)
+        )
+        lines.append(row)
+    return "\n".join(lines)
+
+
+@pytest.mark.parametrize("width, height", [(5, 5), (7, 9), (9, 9), (15, 15), (25, 25)])
+def test_border_is_walled_except_entrance_and_exit(width, height):
+    """外周（角の入口・出口セルを除く）が壁で囲まれていることを確認する。
+
+    穴掘り法の「部屋」が外周セルまで含んでしまうと、外周に壁が残らず
+    迷路として視覚的に破綻する（実案件レビューで発見された不具合）。
+    ASCIIアートで可視化しても目視確認できるよう、失敗時のメッセージに
+    アートを含める。
+    """
+    grid = generate_maze(width, height, rng=random.Random(7))
+    w, h = grid.width, grid.height
+
+    # 入口(スタート側)・出口(ゴール側)としてのみ穴が開くことを許容する2セルずつ。
+    allowed_openings = {
+        (0, 0),
+        (1, 0),
+        (w - 2, h - 1),
+        (w - 1, h - 1),
+    }
+
+    border_cells = set()
+    for x in range(w):
+        border_cells.add((x, 0))
+        border_cells.add((x, h - 1))
+    for y in range(h):
+        border_cells.add((0, y))
+        border_cells.add((w - 1, y))
+
+    ascii_art = _render_ascii(grid)
+
+    for x, y in border_cells:
+        if (x, y) in allowed_openings:
+            continue
+        assert grid.get_cell(x, y).is_wall is True, (
+            f"border cell ({x}, {y}) should remain a wall but is a passage.\n"
+            f"maze ({w}x{h}):\n{ascii_art}"
+        )
