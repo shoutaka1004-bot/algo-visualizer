@@ -47,6 +47,28 @@ body {
   color: #FFFFFF;
 }
 
+.speed-control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.speed-control label {
+  font-size: 0.875rem;
+  color: #FFFFFF;
+}
+
+.speed-control select {
+  padding: 0.5rem;
+  border: 1px solid #CCCCCC;
+  border-radius: 6px;
+  font-size: 1rem;
+  color: var(--color-text);
+  background-color: var(--color-base-card);
+}
+
 .tab-bar {
   display: flex;
   justify-content: center;
